@@ -1,274 +1,554 @@
-[![Alpaca-py](https://github.com/alpacahq/alpaca-py/blob/master/docs/images/alpaca-py-banner.png?raw=true)](https://alpaca.markets/docs/python-sdk)
+# 🚀 Sistema de Trading con Alpaca - Guía Completa
 
-[![Downloads](https://pepy.tech/badge/alpaca-py/month)](https://pepy.tech/project/alpaca-py)
-[![Python Versions](https://img.shields.io/pypi/pyversions/alpaca-py.svg?logo=python&logoColor=white)](https://pypi.org/project/alpaca-py)
-[![GitHub](https://img.shields.io/github/license/alpacahq/alpaca-py?color=blue)](https://github.com/alpacahq/alpaca-py/blob/master/LICENSE.md)
-[![PyPI](https://img.shields.io/pypi/v/alpaca-py?color=blue)](https://pypi.org/project/alpaca-py/)
+Sistema completo de trading automatizado para crypto (BTC/USD) usando Alpaca Paper Trading con estrategias de backtesting y ejecución automática.
 
-## Table of Contents
+## 📋 Tabla de Contenidos
 
-- [About](#about)
-- [Documentation](#documentation)
-- [Installation](#installation)
-- [Update](#update)
-- [What's New?](#whats-new)
-  1.  [Broker API](#broker-api-new)
-  2.  [OOP Design](#oop-design)
-  3.  [Data Validation](#data-validation)
-  4.  [Many Clients](#many-clients)
-- [API Keys](#api-keys)
-  1.  [Trading and Market Data API Keys](#trading-api-keys)
-  2.  [Broker API Keys](#trading-api-keys)
-- [Usage](#usage)
-  1.  [Broker API Example](#broker-api-example)
-  2.  [Trading API Example](#trading-api-example)
-  3.  [Market Data API Example](#data-api-example)
-- [Contributing](https://github.com/alpacahq/alpaca-py/blob/master/CONTRIBUTING.md)
-- [License](https://github.com/alpacahq/alpaca-py/blob/master/LICENSE)
+- [Configuración Inicial](#configuración-inicial)
+- [Scripts Disponibles](#scripts-disponibles)
+- [Backtesting de Estrategias](#backtesting-de-estrategias)
+- [Ejecutar Estrategias Reales](#ejecutar-estrategias-reales)
+- [Monitoreo Continuo](#monitoreo-continuo)
+- [Ver Portfolio](#ver-portfolio)
+- [Estructura de Archivos](#estructura-de-archivos)
+- [Troubleshooting](#troubleshooting)
 
-## About <a name="about"></a>
+---
 
-Alpaca-py provides an interface for interacting with the API products Alpaca offers. These API products are provided as various REST, WebSocket and SSE endpoints that allow you to do everything from streaming market data to creating your own investment apps.
+## 🔧 Configuración Inicial
 
-Learn more about the API products Alpaca offers at https://alpaca.markets.
+### 1. Credenciales de Alpaca
 
-## Documentation <a name="documentation"></a>
+Las credenciales ya están configuradas en todos los scripts:
+- **API Key**: `PKNO6ZAQMZJZEDK7ZEXPL7WXLX`
+- **Secret Key**: `FA3zirHrDfLgzXLMQGQswC3wsaLrMLUzBkSm2X78vqbK`
+- **Modo**: Paper Trading (dinero ficticio)
 
-Alpaca-py has a supplementary documentation site which contains references for all clients, methods and models found in this codebase. The documentation
-also contains examples to get started with alpaca-py.
+### 2. Instalar Dependencias
 
-You can find the documentation site here: https://alpaca.markets/sdks/python/getting_started.html
-
-You can also find the API Reference of Alpaca APIs: https://docs.alpaca.markets/reference
-
-## Installation <a name="installation"></a>
-
-Alpaca-py is supported on Python 3.8+.  You can install Alpaca-py using pip.
-
-Run the following command in your terminal.
-
-```shell
-  pip install alpaca-py
+```bash
+pip install alpaca-py pandas pandas-ta matplotlib numpy
 ```
 
-## Update <a name="update"></a>
-
-If you already have Alpaca-py installed, and would like to use the latest version available...
-
-Run the following command in your terminal:
-
-```shell
-  pip install alpaca-py --upgrade
+O si tienes problemas con permisos:
+```bash
+pip install --break-system-packages alpaca-py pandas pandas-ta matplotlib numpy
 ```
 
-## What’s New? <a name="whats-new"></a>
+### 3. Verificar Conexión
 
-If you’ve used the previous python SDK alpaca-trade-api, there are a few key differences to be aware of.
+```bash
+python3 test_connection.py
+```
 
-### Broker API <a name="broker-api-new"></a>
+Deberías ver:
+```
+✅ Conexión exitosa con Paper Trading!
+Cuenta: PA3GAZPWAGAY
+Efectivo: $99,999.94
+```
 
-Alpaca-py lets you use Broker API to start building your investment apps! Learn more at the [Broker](https://docs.alpaca.markets/docs/about-broker-api) page.
+---
 
-### OOP Design <a name="oop-design"></a>
+## 🎯 Script Maestro (Recomendado)
 
-Alpaca-py uses a more OOP approach to submitting requests compared to the previous SDK. To submit a request, you will most likely need to create a request object containing the desired request data. Generally, there is a unique request model for each method.
+### `trading_master.py` - Todo en Uno ⭐
 
-Some examples of request models corresponding to methods:
+**Un solo script para todo: backtesting, ejecución real y monitoreo**
 
-- `GetOrdersRequest` for `TradingClient.get_orders()`
-- `CryptoLatestOrderbookRequest` for `CryptoHistoricalDataClient.get_crypto_latest_orderbook()`
+```bash
+# Ver menú de ayuda
+python3 trading_master.py
 
-**Request Models Usage Example**
+# Backtesting de TODAS las estrategias (default)
+python3 trading_master.py --backtest all
 
-To get historical bar data for crypto, you will need to provide a `CryptoBarsRequest` object.
+# Backtesting de una estrategia específica
+python3 trading_master.py --backtest 5  # MACD
+
+# Ejecutar TODAS las estrategias en modo real (usa la mejor señal)
+python3 trading_master.py --execute all
+
+# Ejecutar estrategia específica en modo real
+python3 trading_master.py --execute 5  # MACD
+
+# Monitoreo continuo (todas las estrategias, cada hora)
+python3 trading_master.py --monitor all 1
+
+# Monitoreo continuo (estrategia específica, cada 2 horas)
+python3 trading_master.py --monitor 5 2
+```
+
+**Estrategias disponibles:**
+- `1` - EMA Crossover (9/21)
+- `2` - EMA Crossover (5/13)
+- `3` - SMA Crossover (9/21)
+- `4` - SMA Crossover (5/13)
+- `5` - MACD (12/26/9) ⭐ Mejor rendimiento
+- `6` - Triple SMA (5/13/21)
+- `all` - Todas las estrategias (default)
+
+---
+
+## 📊 Scripts Disponibles (Alternativos)
+
+### Backtesting (Simulación)
+
+#### 1. Probar Todas las Estrategias
+```bash
+python3 backtesting_estrategias.py
+```
+
+**Qué hace:**
+- Prueba 7 estrategias diferentes
+- Compara rentabilidad y win rate
+- Genera gráficos en `backtest_results/`
+- Muestra cuál es la mejor estrategia
+
+**Estrategias incluidas:**
+- **EMA Crossover** (9/21, 5/13, 12/26)
+- **SMA Crossover** (9/21, 5/13, 12/26) ⭐ **Nuevo**
+- **EMA + RSI**
+- **SMA + RSI** ⭐ **Nuevo**
+- **EMA + Volumen**
+- **SMA + Volumen** ⭐ **Nuevo**
+- **Triple SMA** (5/13/21) ⭐ **Nuevo**
+- **MACD** (12/26/9) ⭐ **Mejor según backtesting**
+- **Bollinger Bands**
+
+**Resultados esperados:**
+```
+🏆 MEJOR ESTRATEGIA: MACD (12/26/9)
+💰 Retorno: +X.XX%
+📊 Win Rate: 44.4%
+```
+
+#### 2. Backtesting Básico (EMA Crossover)
+```bash
+python3 backtesting_btc.py
+```
+
+#### 3. Backtesting Day Trading
+```bash
+python3 backtesting_day_trading.py
+```
+
+---
+
+### Ejecutar Estrategias Reales
+
+#### 1. Mejor Estrategia (MACD)
+```bash
+python3 ejecutar_mejor_estrategia.py
+```
+
+Ejecuta la estrategia MACD que tuvo mejor rendimiento en backtesting.
+
+#### 1b. Estrategia SMA Crossover
+```bash
+python3 ejecutar_estrategia_sma.py
+```
+
+Ejecuta estrategia usando Simple Moving Average (SMA) en lugar de EMA.
+
+#### 2. Todas las Estrategias
+```bash
+python3 ejecutar_todas_estrategias.py
+```
+
+Analiza todas las estrategias y ejecuta la que tenga señal más fuerte.
+
+#### 3. Day Trading
+```bash
+# Ejecutar una vez
+python3 day_trading_btc.py
+
+# Monitoreo continuo cada 5 minutos
+python3 day_trading_btc.py --monitor 5
+```
+
+#### 4. Estrategia con Monitoreo
+```bash
+# Ejecutar una vez
+python3 estrategia_real.py
+
+# Monitoreo continuo cada hora
+python3 estrategia_real.py --monitor 1
+```
+
+---
+
+## 🔬 Backtesting de Estrategias
+
+### Cómo Funciona
+
+El backtesting simula operaciones históricas para evaluar la rentabilidad de una estrategia **sin riesgo**.
+
+### Ejecutar Backtesting
+
+```bash
+python3 backtesting_estrategias.py
+```
+
+### Interpretar Resultados
+
+**Métricas importantes:**
+- **Retorno %**: Ganancia o pérdida porcentual
+- **Win Rate**: Porcentaje de trades ganadores
+- **Total Trades**: Número de operaciones
+- **Ganancia promedio**: Ganancia promedio por trade
+
+**Ejemplo de salida:**
+```
+🏆 MEJOR ESTRATEGIA: MACD (12/26/9)
+💰 Retorno: +0.15% ($+1.51)
+📊 Win Rate: 44.4%
+📈 Trades: 36 (18 compras, 18 ventas)
+💵 Ganancia promedio: $+0.08
+✅ Trades ganadores: 8
+❌ Trades perdedores: 10
+```
+
+### Gráficos Generados
+
+Los gráficos se guardan automáticamente en `backtest_results/`:
+- `backtest_EMA_Crossover_(9_21).png`
+- `backtest_MACD_*.png`
+- `backtest_day_trading.png`
+- etc.
+
+---
+
+## 🚀 Ejecutar Estrategias Reales
+
+### ⚠️ Importante
+
+Las estrategias reales **ejecutan operaciones reales** en Paper Trading que actualizan tu portfolio en Alpaca.
+
+### Opciones Disponibles
+
+#### Opción 1: Mejor Estrategia (Recomendado)
+```bash
+python3 ejecutar_mejor_estrategia.py
+```
+
+Usa la estrategia MACD que tuvo mejor rendimiento.
+
+#### Opción 2: Múltiples Estrategias
+```bash
+python3 ejecutar_todas_estrategias.py
+```
+
+Analiza todas y ejecuta la mejor señal.
+
+#### Opción 3: Operación Manual
+```bash
+python3 ejecutar_operacion_real.py
+```
+
+Para hacer operaciones manuales de prueba.
+
+### Qué Esperar
+
+Cuando hay una señal:
+```
+🟢 SEÑAL DE COMPRA (MACD)
+   MACD cruzó por encima de la señal
+   Comprando 0.000114 BTC/USD (~$10.00)...
+
+✅ ORDEN EJECUTADA:
+   ID: abc123-def456-...
+   Estado: OrderStatus.FILLED
+
+💰 Tu portfolio en Alpaca se actualizará en unos segundos!
+```
+
+---
+
+## 🔄 Monitoreo Continuo
+
+### Configurar Monitoreo Automático
+
+#### Monitoreo Cada Hora
+```bash
+python3 estrategia_real.py --monitor 1
+```
+
+#### Monitoreo Day Trading (Cada 5 minutos)
+```bash
+python3 day_trading_btc.py --monitor 5
+```
+
+### Detener Monitoreo
+
+Presiona `Ctrl+C` en la terminal.
+
+### Qué Hace el Monitoreo
+
+1. Obtiene datos del mercado
+2. Calcula señales de las estrategias
+3. Ejecuta operaciones automáticamente si hay señal
+4. Espera el intervalo configurado
+5. Repite el proceso
+
+---
+
+## 💰 Ver Portfolio
+
+### Ver Estado Actual
+```bash
+python3 ver_wallet.py
+```
+
+Muestra:
+- Efectivo disponible
+- Patrimonio total
+- Posiciones abiertas
+- Órdenes recientes
+
+### Ver Operaciones Rápidas
+```bash
+python3 operar_btc.py
+```
+
+---
+
+## 📁 Estructura de Archivos
+
+```
+alpaca-py/
+├── README.md                          # Este archivo
+├── backtest_results/                  # Gráficos de backtesting
+│   ├── README.md
+│   ├── backtest_EMA_Crossover_*.png
+│   ├── backtest_MACD_*.png
+│   └── backtest_day_trading.png
+│
+├── # Scripts de Backtesting
+├── backtesting_estrategias.py        # Probar todas las estrategias
+├── backtesting_btc.py                # Backtesting básico
+├── backtesting_day_trading.py         # Backtesting day trading
+│
+├── # Scripts de Ejecución Real
+├── ejecutar_mejor_estrategia.py       # Ejecutar MACD (mejor estrategia)
+├── ejecutar_todas_estrategias.py     # Ejecutar todas las estrategias
+├── ejecutar_operacion_real.py         # Operación manual
+├── estrategia_real.py                 # Estrategia con monitoreo
+├── day_trading_btc.py                # Day trading
+│
+├── # Utilidades
+├── ver_wallet.py                      # Ver portfolio
+├── operar_btc.py                      # Operaciones rápidas
+├── test_connection.py                 # Verificar conexión
+│
+└── examples/
+    └── crypto/
+        ├── crypto-trading-basic.ipynb      # Notebook básico
+        └── crypto-btc-usd-swing-trade.ipynb # Notebook swing trade
+```
+
+---
+
+## 🎯 Flujo de Trabajo Recomendado
+
+### 1. Probar Estrategias (Backtesting)
+```bash
+python3 backtesting_estrategias.py
+```
+
+### 2. Revisar Resultados
+- Ver qué estrategia tiene mejor win rate
+- Revisar gráficos en `backtest_results/`
+- Analizar métricas de rentabilidad
+
+### 3. Ejecutar Mejor Estrategia
+```bash
+python3 ejecutar_mejor_estrategia.py
+```
+
+### 4. Configurar Monitoreo (Opcional)
+```bash
+python3 estrategia_real.py --monitor 1
+```
+
+### 5. Monitorear Portfolio
+```bash
+python3 ver_wallet.py
+```
+
+---
+
+## ⚙️ Personalizar Estrategias
+
+### Modificar Parámetros
+
+Edita los scripts y cambia:
 
 ```python
-from alpaca.data.historical import CryptoHistoricalDataClient
-from alpaca.data.requests import CryptoBarsRequest
-from alpaca.data.timeframe import TimeFrame
-from datetime import datetime
+# En backtesting_estrategias.py o ejecutar_mejor_estrategia.py
 
-# no keys required for crypto data
-client = CryptoHistoricalDataClient()
-
-request_params = CryptoBarsRequest(
-                        symbol_or_symbols=["BTC/USD", "ETH/USD"],
-                        timeframe=TimeFrame.Day,
-                        start=datetime(2022, 7, 1)
-                 )
-
-bars = client.get_crypto_bars(request_params)
+SYMBOL = "BTC/USD"        # Cambiar a ETH/USD, SOL/USD, etc.
+EMA_SHORT = 9             # Períodos EMA corta
+EMA_LONG = 21             # Períodos EMA larga
+MIN_ORDER_VALUE = 10.0    # Mínimo $10 (requerido por Alpaca)
+DAYS_BACK = 30            # Días de datos históricos
 ```
 
-### Data Validation <a name="data-validation"></a>
+### Crear Nueva Estrategia
 
-Alpaca-py uses _pydantic_ to validate data models at run-time. This means if you are receiving request data via JSON from a client. You can handle parsing and validation through Alpaca’s request models. All request models can be instantiated by passing in data in dictionary format.
-
-Here is a rough example of what is possible.
+1. Edita `backtesting_estrategias.py`
+2. Agrega una nueva función:
 
 ```python
-
- @app.route('/post_json', methods=['POST'])
- def do_trade():
-     # ...
-
-     order_data_json = request.get_json()
-
-     # validate data
-     MarketOrderRequest(**order_data_json)
-
-     # ...
+def mi_estrategia_personal(df):
+    """Mi estrategia personalizada"""
+    df = df.copy()
+    # Tu lógica aquí
+    df['buy_signal'] = ...  # Condiciones de compra
+    df['sell_signal'] = ...  # Condiciones de venta
+    return df, "Mi Estrategia Personal"
 ```
 
-### Many Clients <a name="many-clients"></a>
+3. Agrégala a la lista de estrategias
+4. Ejecuta backtesting para probarla
 
-Alpaca-py has a lot of client classes. There is a client for each API and even asset class specific clients (`StockHistoricalDataClient`, `CryptoDataStream`, `OptionHistoricalDataClient`). This requires you to pick and choose clients based on your needs.
+---
 
-**Broker API:** `BrokerClient`
+## 🐛 Troubleshooting
 
-**Trading API:** `TradingClient`
+### Error: "unauthorized" o 401
 
-**Market Data API:** `StockHistoricalDataClient`, `CryptoHistoricalDataClient`, `NewsClient`, `OptionHistoricalDataClient`, `CryptoDataStream`, `StockDataStream`, `NewsDataStream`, `OptionDataStream`
+**Problema**: Las credenciales no funcionan.
 
-## API Keys <a name="api-keys"></a>
+**Solución**:
+1. Ve a https://app.alpaca.markets/paper/dashboard/overview
+2. Regenera tus API keys
+3. Actualiza las credenciales en los scripts:
+   ```python
+   API_KEY = "tu_nueva_key"
+   SECRET_KEY = "tu_nuevo_secret"
+   ```
 
-### Trading and Market Data API <a name="trading-api-keys"></a>
+### Error: "cost basis must be >= minimal amount of order 10"
 
-In order to use Alpaca’s services you’ll need to sign up for an Alpaca account and retrieve your API keys. Signing up is completely free and takes only a few minutes. Sandbox environments are available to test out the API. To use the sandbox environment, you will need to provide sandbox/paper keys. API keys are passed into Alpaca-py through either `TradingClient`, `StockHistoricalDataClient`, `CryptoHistoricalDataClient`, `NewsClient`, `OptionHistoricalDataClient`, `StockDataStream`, `CryptoDataStream`,`NewsDataStream`, or `OptionDataStream`.
+**Problema**: La orden es menor a $10.
 
-### Broker API <a name="broker-api-keys"></a>
+**Solución**: El script ya calcula automáticamente el mínimo. Si persiste, verifica que `MIN_ORDER_VALUE = 10.0`.
 
-To use the Broker API, you will need to sign up for a broker account and retrieve your Broker API keys. The API keys can be found on the dashboard once you’ve logged in. Alpaca also provides a sandbox environment to test out Broker API. To use the sandbox mode, provide your sandbox keys. Once you have your keys, you can pass them into `BrokerClient` to get started.
+### Error: "ModuleNotFoundError"
 
-## Usage <a name="usage"></a>
+**Problema**: Faltan dependencias.
 
-Alpaca’s APIs allow you to do everything from building algorithmic trading strategies to building a full brokerage experience for your own end users. Here are some things you can do with Alpaca-py.
-
-To view full descriptions and examples view the [documentation page](https://alpaca.markets/sdks/python/).
-
-**Market Data API**: Access live and historical market data for 5000+ stocks, 20+ crypto, and options.
-
-**Trading API**: Trade stock and crypto with lightning fast execution speeds.
-
-**Broker API & Connect**: Build investment apps - from robo-advisors to brokerages.
-
-### Broker API Example <a name="broker-api-example"></a>
-
-**Listing All Accounts**
-
-The `BrokerClient.list_accounts` method allows you to list all the brokerage accounts under your management. The method takes an optional parameter `search_parameters` which requires a `ListAccountsRequest` object. This parameter allows you to filter the list of accounts returned.
-
-```python
-from alpaca.broker.client import BrokerClient
-from alpaca.broker.requests import ListAccountsRequest
-from alpaca.broker.enums import AccountEntities
-
-broker_client = BrokerClient('api-key', 'secret-key')
-
-# search for accounts created after January 30th 2022.
-# Response should contain Contact and Identity fields for each account.
-filter = ListAccountsRequest(
-                    created_after=datetime.datetime.strptime("2022-01-30", "%Y-%m-%d"),
-                    entities=[AccountEntities.CONTACT, AccountEntities.IDENTITY]
-                    )
-
-accounts = broker_client.list_accounts(search_parameters=filter)
+**Solución**:
+```bash
+pip install --break-system-packages alpaca-py pandas pandas-ta matplotlib numpy
 ```
 
-### Trading API Example <a name="trading-api-example"></a>
+### Las imágenes no se generan
 
-**Submitting an Order**
+**Problema**: Error al generar gráficos.
 
-To create an order on Alpaca-py you must use an `OrderRequest` object. There are different `OrderRequest` objects based on the type of order you want to make. For market orders, there is `MarketOrderRequest`, limit orders have `LimitOrderRequest`, stop orders `StopOrderRequest`, and trailing stop orders have `TrailingStopOrderRequest`. Each order type have their own required parameters for a successful order.
+**Solución**:
+- Verifica que matplotlib esté instalado
+- Los gráficos se guardan en `backtest_results/`
+- Revisa permisos de escritura
 
-```python
-from alpaca.trading.client import TradingClient
-from alpaca.trading.requests import MarketOrderRequest
-from alpaca.trading.enums import OrderSide, TimeInForce
+### El portfolio no se actualiza
 
-trading_client = TradingClient('api-key', 'secret-key')
+**Problema**: Las operaciones no aparecen en Alpaca.
 
+**Solución**:
+1. Verifica que las órdenes se ejecutaron: `python3 ver_wallet.py`
+2. Refresca el dashboard de Alpaca
+3. Espera unos segundos (puede haber delay)
 
-# preparing order data
-market_order_data = MarketOrderRequest(
-                      symbol="BTC/USD",
-                      qty=0.0001,
-                      side=OrderSide.BUY,
-                      time_in_force=TimeInForce.DAY
-                  )
+---
 
-# Market order
-market_order = trading_client.submit_order(
-                order_data=market_order_data
-                )
-```
+## 📊 Estrategias Disponibles
 
-### Market Data API Example <a name="data-api-example"></a>
+### 1. EMA Crossover
+- **Descripción**: Compra cuando EMA corta cruza por encima de EMA larga
+- **Parámetros**: EMA_SHORT, EMA_LONG
+- **Win Rate**: ~20-30%
 
-**Querying Historical Bar Data**
+### 1b. SMA Crossover ⭐ **NUEVO**
+- **Descripción**: Compra cuando SMA corta cruza por encima de SMA larga
+- **Parámetros**: SMA_SHORT, SMA_LONG
+- **Win Rate**: ~21-28%
+- **Diferencia con EMA**: SMA da igual peso a todos los períodos, EMA da más peso a precios recientes
 
-You can request bar data via the HistoricalDataClients. In this example, we query daily bar data for “BTC/USD” and “ETH/USD” since July 1st 2022. You can convert the response to a multi-index pandas dataframe using the `.df` property. There are `StockHistoricalDataClient` and `OptionHistoricalDataClient` that you also could use to fetch equity/options historical data.
+### 2. MACD (Mejor Rendimiento)
+- **Descripción**: Usa indicador MACD para señales
+- **Parámetros**: Fast=12, Slow=26, Signal=9
+- **Win Rate**: ~44.4% ⭐
 
-```python
-from alpaca.data.historical import CryptoHistoricalDataClient
-from alpaca.data.requests import CryptoBarsRequest
-from alpaca.data.timeframe import TimeFrame
-from datetime import datetime
+### 3. EMA + RSI
+- **Descripción**: EMA Crossover filtrado por RSI
+- **Parámetros**: EMA + RSI (30/70)
+- **Win Rate**: ~27%
 
-# no keys required for crypto data
-client = CryptoHistoricalDataClient()
+### 4. Bollinger Bands
+- **Descripción**: Compra en banda inferior, vende en superior
+- **Parámetros**: Length=20, Std=2
+- **Win Rate**: Variable
 
-request_params = CryptoBarsRequest(
-                        symbol_or_symbols=["BTC/USD", "ETH/USD"],
-                        timeframe=TimeFrame.Day,
-                        start=datetime.strptime("2022-07-01", '%Y-%m-%d')
-                        )
+### 5. EMA + Volumen
+- **Descripción**: EMA Crossover con confirmación de volumen
+- **Parámetros**: EMA + Volumen threshold
+- **Win Rate**: Variable
 
-bars = client.get_crypto_bars(request_params)
+### 5b. SMA + Volumen ⭐ **NUEVO**
+- **Descripción**: SMA Crossover con confirmación de volumen
+- **Parámetros**: SMA + Volumen threshold
+- **Win Rate**: ~40%
 
-# convert to dataframe
-bars.df
+### 6. Triple SMA ⭐ **NUEVO**
+- **Descripción**: Usa 3 SMAs (rápida, media, lenta) para confirmación
+- **Parámetros**: SMA_FAST, SMA_MEDIUM, SMA_SLOW
+- **Win Rate**: ~50% (muy conservadora, pocos trades)
 
-```
+---
 
-**Querying News Data** <a name="news-client-example"></a>
+## 📝 Notas Importantes
 
-You can query news data via the NewsClient. In this example, we query news data for “TSLA” since July 1st 2022. You can convert the response to a pandas dataframe using the `.df` property.
+1. **Paper Trading**: Todas las operaciones son con dinero ficticio
+2. **Mínimo de Orden**: $10 USD requerido por Alpaca
+3. **Backtesting vs Real**:
+   - Backtesting = Simulación (no actualiza portfolio)
+   - Estrategias reales = Operaciones reales (actualiza portfolio)
+4. **Monitoreo Continuo**: Usa con cuidado, puede ejecutar muchas operaciones
+5. **Credenciales**: Nunca compartas tus API keys
 
-```python
-from alpaca.data.historical.news import NewsClient
-from alpaca.data.requests import NewsRequest
-from datetime import datetime
+---
 
-# no keys required for news data
-client = NewsClient()
+## 🎓 Recursos Adicionales
 
-request_params = NewsRequest(
-                        symbols="TSLA",
-                        start=datetime.strptime("2022-07-01", '%Y-%m-%d')
-                        )
+- **Documentación Alpaca**: https://docs.alpaca.markets/
+- **Dashboard Paper Trading**: https://app.alpaca.markets/paper/dashboard/overview
+- **Notebooks de Ejemplo**: `examples/crypto/`
 
-news = client.get_news(request_params)
+---
 
-# convert to dataframe
-news.df
+## ✅ Checklist de Uso
 
-```
+- [ ] Credenciales configuradas
+- [ ] Dependencias instaladas
+- [ ] Conexión verificada (`test_connection.py`)
+- [ ] Backtesting ejecutado para encontrar mejor estrategia
+- [ ] Estrategia real probada una vez
+- [ ] Monitoreo configurado (opcional)
+- [ ] Portfolio monitoreado regularmente
 
-### Options Trading <a name="options-trading"></a>
+---
 
-We're excited to support options trading! Use this section to read up on Alpaca's options trading capabilities.
-For more details, please refer to [our documentation page for options trading](https://docs.alpaca.markets/docs/options-trading)
+## 🆘 Soporte
 
-There is an example jupyter notebook to explain methods of alpaca-py for options trading.
+Si tienes problemas:
+1. Revisa la sección [Troubleshooting](#troubleshooting)
+2. Verifica las credenciales
+3. Ejecuta `test_connection.py` para diagnosticar
+4. Revisa los logs de error en la terminal
 
-* [jupyter notebook: options trading basic example with alpaca-py](https://github.com/alpacahq/alpaca-py/blob/master/examples/options/options-trading-basic.ipynb)
+---
 
-### Jupyter Notebook Library <a name="colab-library"></a>
-
-Explore examples for stocks, options, and crypto using alpaca-py. Notebooks for each asset class are provided in their respective directories!
-
-* [Stocks](https://github.com/alpacahq/alpaca-py/blob/master/examples/stocks/README.md)
-* [Crypto](https://github.com/alpacahq/alpaca-py/blob/master/examples/crypto/README.md)
-* [Options](https://github.com/alpacahq/alpaca-py/blob/master/examples/options/README.md)
-* [Multi-Leg Options](https://github.com/alpacahq/alpaca-py/blob/master/examples/options/README.md)
+**¡Buena suerte con tu trading! 🚀**

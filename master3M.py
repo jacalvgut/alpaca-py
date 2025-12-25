@@ -577,17 +577,30 @@ def dibujar_estructura_mentfx_escalonada(ax, df, rango_visible=None):
     - Línea para swing highs (estructura de máximos)
     - Línea para swing lows (estructura de mínimos)
     
+    Usa los swing points filtrados (structure_high/structure_low) para evitar cruces
+    entre las líneas de estructura. Si no existen, usa los swing points originales.
+    
     Args:
         ax: Axis de matplotlib
-        df: DataFrame con swing highs y lows
+        df: DataFrame con swing highs y lows (o structure_high/structure_low si están disponibles)
         rango_visible: Tuple (min_idx, max_idx) para filtrar datos visibles
     """
-    if 'swing_high' not in df.columns or 'swing_low' not in df.columns:
-        return
+    # Priorizar usar los swing points filtrados (structure_high/structure_low)
+    # que evitan cruces, si están disponibles
+    use_filtered = 'structure_high' in df.columns and 'structure_low' in df.columns
     
-    # Obtener todos los swing points del DataFrame completo (para líneas continuas)
-    swing_highs_all = df[df['swing_high'] == True].copy().sort_index()
-    swing_lows_all = df[df['swing_low'] == True].copy().sort_index()
+    if use_filtered:
+        swing_highs_all = df[df['structure_high'] == True].copy().sort_index()
+        swing_lows_all = df[df['structure_low'] == True].copy().sort_index()
+        price_col_high = 'structure_high_price'
+        price_col_low = 'structure_low_price'
+    elif 'swing_high' in df.columns and 'swing_low' in df.columns:
+        swing_highs_all = df[df['swing_high'] == True].copy().sort_index()
+        swing_lows_all = df[df['swing_low'] == True].copy().sort_index()
+        price_col_high = 'swing_high_price'
+        price_col_low = 'swing_low_price'
+    else:
+        return
     
     if swing_highs_all.empty and swing_lows_all.empty:
         return
@@ -609,7 +622,7 @@ def dibujar_estructura_mentfx_escalonada(ax, df, rango_visible=None):
         for idx, row in swing_highs_all.iterrows():
             swing_highs_list.append({
                 'timestamp': idx,
-                'price': row['swing_high_price']
+                'price': row[price_col_high]
             })
         
         # Dibujar líneas escalonadas para swing highs
@@ -650,7 +663,7 @@ def dibujar_estructura_mentfx_escalonada(ax, df, rango_visible=None):
         for idx, row in swing_lows_all.iterrows():
             swing_lows_list.append({
                 'timestamp': idx,
-                'price': row['swing_low_price']
+                'price': row[price_col_low]
             })
         
         # Dibujar líneas escalonadas para swing lows
